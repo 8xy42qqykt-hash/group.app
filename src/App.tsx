@@ -15,6 +15,15 @@ const MainAppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
   const { currentTrip } = useTrip();
   const [activeTab, setActiveTab] = useState<TabKey>('messages');
+  const [isForcedReady, setIsForcedReady] = useState(false);
+
+  // Maximum splash timeout of 1.2s to guarantee first-time visitor never hangs
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsForcedReady(true);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Always reset to messages view whenever a trip opens
   useEffect(() => {
@@ -23,8 +32,8 @@ const MainAppContent: React.FC = () => {
     }
   }, [currentTrip?.id]);
 
-  // Splash screen until session resolves
-  if (isLoading) {
+  // Splash screen until session resolves (capped by safety timeout)
+  if (isLoading && !isForcedReady) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-black">
         <div className="w-10 h-10 rounded-[18px] bg-[#0A84FF] flex items-center justify-center animate-pulse" />

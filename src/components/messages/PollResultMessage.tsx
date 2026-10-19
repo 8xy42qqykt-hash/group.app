@@ -70,13 +70,13 @@ export const PollResultMessage: React.FC<PollResultMessageProps> = ({ metadata, 
                 </span>
               </div>
 
-              {/* Thin slider bar */}
+              {/* Thin slider bar - WHITE not yellow */}
               <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/20">
                 <div
                   className={`h-full rounded-full transition-all duration-300 ${
                     isWinner
-                      ? 'bg-amber-300'
-                      : (isOwn ? 'bg-white/80' : 'bg-white/50')
+                      ? 'bg-white'
+                      : 'bg-white/60'
                   }`}
                   style={{ width: `${pct}%` }}
                 />

@@ -30,10 +30,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setUser(null);
     setProfile(null);
-    localStorage.removeItem('trip_local_user');
-    localStorage.removeItem('trip_local_profile');
-    localStorage.removeItem('active_trip_id');
     try {
+      localStorage.removeItem('trip_local_user');
+      localStorage.removeItem('trip_local_profile');
+      localStorage.removeItem('active_trip_id');
       for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && (key.startsWith('sb-') || key.includes('auth-token'))) {
@@ -81,70 +81,92 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  // Initialize session
+  // Initialize session with safety timer so first-time load NEVER hangs on blank screen
   useEffect(() => {
     let isMounted = true;
 
+    // Hard fallback: after 1.5 seconds, ALWAYS end loading
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 1500);
+
     async function initAuth() {
-      if (isCloudActive && supabase) {
-        try {
-          const { data: userData, error: userError } = await supabase.auth.getUser();
-          if (userError || !userData?.user) {
+      try {
+        if (isCloudActive && supabase) {
+          try {
+            // Race with 1.2s timeout so network hangs never freeze the app
+            const getUserPromise = supabase.auth.getUser();
+            const timeoutPromise = new Promise<{ data: { user: null }; error: Error }>((resolve) =>
+              setTimeout(() => resolve({ data: { user: null }, error: new Error('Auth check timeout') }), 1200)
+            );
+
+            const { data: userData, error: userError } = await Promise.race([
+              getUserPromise,
+              timeoutPromise,
+            ]);
+
+            if (userError || !userData?.user) {
+              await clearZombieAuth();
+              if (isMounted) {
+                setUser(null);
+                setProfile(null);
+              }
+            } else if (isMounted) {
+              setUser({ id: userData.user.id, email: userData.user.email });
+              await fetchCloudProfile(userData.user.id, userData.user.email);
+            }
+          } catch (err) {
+            console.warn('Error verifying user:', err);
             await clearZombieAuth();
             if (isMounted) {
               setUser(null);
               setProfile(null);
-              setIsLoading(false);
             }
-          } else if (isMounted) {
-            setUser({ id: userData.user.id, email: userData.user.email });
-            await fetchCloudProfile(userData.user.id, userData.user.email);
-            if (isMounted) setIsLoading(false);
           }
-        } catch (err) {
-          console.warn('Error verifying user:', err);
-          await clearZombieAuth();
-          if (isMounted) {
-            setUser(null);
-            setProfile(null);
+
+          const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (!isMounted) return;
+            if (event === 'SIGNED_OUT' || !session?.user) {
+              setUser(null);
+              setProfile(null);
+              setIsLoading(false);
+              return;
+            }
+
+            if (session?.user) {
+              setUser({ id: session.user.id, email: session.user.email });
+              await fetchCloudProfile(session.user.id, session.user.email);
+            } else {
+              setUser(null);
+              setProfile(null);
+            }
             setIsLoading(false);
-          }
-        }
+          });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-          if (!isMounted) return;
-          if (event === 'SIGNED_OUT' || !session?.user) {
-            setUser(null);
-            setProfile(null);
-            setIsLoading(false);
-            return;
-          }
-
-          if (session?.user) {
-            setUser({ id: session.user.id, email: session.user.email });
-            await fetchCloudProfile(session.user.id, session.user.email);
-          } else {
-            setUser(null);
-            setProfile(null);
-          }
-          setIsLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
-      } else {
-        // Local persistence fallback
-        const localUserStr = localStorage.getItem('trip_local_user');
-        const localProfileStr = localStorage.getItem('trip_local_profile');
-        if (localUserStr && localProfileStr && isMounted) {
+          return () => subscription.unsubscribe();
+        } else {
+          // Local persistence fallback
           try {
-            setUser(JSON.parse(localUserStr));
-            setProfile(JSON.parse(localProfileStr));
+            const localUserStr = localStorage.getItem('trip_local_user');
+            const localProfileStr = localStorage.getItem('trip_local_profile');
+            if (localUserStr && localProfileStr && isMounted) {
+              try {
+                setUser(JSON.parse(localUserStr));
+                setProfile(JSON.parse(localProfileStr));
+              } catch {
+                localStorage.removeItem('trip_local_user');
+                localStorage.removeItem('trip_local_profile');
+              }
+            }
           } catch {
-            localStorage.removeItem('trip_local_user');
-            localStorage.removeItem('trip_local_profile');
+            // Ignore storage restriction
           }
         }
-        if (isMounted) setIsLoading(false);
+      } finally {
+        if (isMounted) {
+          clearTimeout(safetyTimer);
+          setIsLoading(false);
+        }
       }
     }
 
@@ -152,6 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimer);
     };
   }, []);
 
