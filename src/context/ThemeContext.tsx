@@ -12,13 +12,25 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
-    return (localStorage.getItem('trip_theme_mode') as ThemeMode) || 'dark';
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return (localStorage.getItem('trip_theme_mode') as ThemeMode) || 'dark';
+      }
+    } catch {
+      // Storage access may be restricted
+    }
+    return 'dark';
   });
 
   const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const stored = localStorage.getItem('trip_theme_mode') as ThemeMode;
-    if (stored === 'light') return false;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem('trip_theme_mode') as ThemeMode;
+        if (stored === 'light') return false;
+      }
+    } catch {
+      // Storage access may be restricted
+    }
     return true; // Default dark
   });
 

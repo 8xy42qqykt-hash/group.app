@@ -52,7 +52,16 @@ interface TripContextType {
 const TripContext = createContext<TripContextType | undefined>(undefined);
 
 // Cross-tab Realtime channel for local preview
-const realtimeChannel = typeof window !== 'undefined' ? new BroadcastChannel('trip_realtime_sync') : null;
+const realtimeChannel = (() => {
+  try {
+    if (typeof window !== 'undefined' && typeof BroadcastChannel !== 'undefined') {
+      return new BroadcastChannel('trip_realtime_sync');
+    }
+  } catch (err) {
+    console.warn('BroadcastChannel not supported in this environment:', err);
+  }
+  return null;
+})();
 
 export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, profile } = useAuth();

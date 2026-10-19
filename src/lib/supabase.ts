@@ -1,10 +1,19 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Load credentials from environment or localStorage
-const envUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-const storedUrl = typeof window !== 'undefined' ? localStorage.getItem('trip_supabase_url') : null;
-const storedKey = typeof window !== 'undefined' ? localStorage.getItem('trip_supabase_anon_key') : null;
+const envUrl = (import.meta as any)?.env?.VITE_SUPABASE_URL as string | undefined;
+const envKey = (import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY as string | undefined;
+
+let storedUrl: string | null = null;
+let storedKey: string | null = null;
+try {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    storedUrl = localStorage.getItem('trip_supabase_url');
+    storedKey = localStorage.getItem('trip_supabase_anon_key');
+  }
+} catch {
+  // localStorage may be disabled
+}
 
 export const supabaseUrl = storedUrl || envUrl || '';
 export const supabaseAnonKey = storedKey || envKey || '';
@@ -17,18 +26,26 @@ export const isCloudSupabaseConfigured = Boolean(
 );
 
 export function saveSupabaseCredentials(url: string, key: string) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('trip_supabase_url', url.trim());
-    localStorage.setItem('trip_supabase_anon_key', key.trim());
-    window.location.reload();
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('trip_supabase_url', url.trim());
+      localStorage.setItem('trip_supabase_anon_key', key.trim());
+      window.location.reload();
+    }
+  } catch {
+    // Ignore
   }
 }
 
 export function clearSupabaseCredentials() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('trip_supabase_url');
-    localStorage.removeItem('trip_supabase_anon_key');
-    window.location.reload();
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('trip_supabase_url');
+      localStorage.removeItem('trip_supabase_anon_key');
+      window.location.reload();
+    }
+  } catch {
+    // Ignore
   }
 }
 
