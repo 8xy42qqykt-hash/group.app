@@ -51,6 +51,28 @@ export const MessagesView: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
+  const handleFocus = () => {
+    setIsKeyboardOpen(true);
+    const vv = window.visualViewport;
+    if (vv) {
+      const diff = window.innerHeight - vv.height;
+      if (diff > 40) {
+        setKeyboardHeight(diff);
+      }
+    }
+    setTimeout(scrollToBottom, 60);
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      const vv = window.visualViewport;
+      if (!vv || window.innerHeight - vv.height <= 40) {
+        setIsKeyboardOpen(false);
+        setKeyboardHeight(0);
+      }
+    }, 120);
+  };
+
   // Track visualViewport for iOS and mobile keyboard changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -58,10 +80,10 @@ export const MessagesView: React.FC = () => {
     const handleViewportChange = () => {
       const vv = window.visualViewport;
       if (!vv) return;
-      const offsetFromBottom = window.innerHeight - (vv.height + (vv.offsetTop || 0));
-      const isOpen = offsetFromBottom > 80 || (window.innerHeight - vv.height > 80);
+      const diff = window.innerHeight - vv.height;
+      const isOpen = diff > 40;
       setIsKeyboardOpen(isOpen);
-      setKeyboardHeight(isOpen ? Math.max(0, offsetFromBottom, window.innerHeight - vv.height) : 0);
+      setKeyboardHeight(isOpen ? diff : 0);
       if (isOpen) {
         setTimeout(scrollToBottom, 60);
       }
@@ -208,13 +230,13 @@ export const MessagesView: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full w-full max-w-md mx-auto relative bg-[#f2f2f7] dark:bg-black overflow-hidden select-none">
-      {/* Translucent blurred top bar with trip picture stack & centered trip name (NO ARROW) */}
+      {/* Translucent blurred top bar with trip picture stack & centered trip name (NO ARROW) - tall enough to never overflow */}
       <header
         style={{
           backdropFilter: 'blur(24px) saturate(180%)',
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
         }}
-        className="shrink-0 h-14 pt-safe px-3 flex items-center justify-between z-20 bg-white/75 dark:bg-[#1c1c1e]/75 border-b border-black/[0.06] dark:border-white/[0.08] select-none transition-colors"
+        className="shrink-0 min-h-[4.25rem] pt-[max(0.6rem,env(safe-area-inset-top))] pb-2.5 px-3.5 flex items-center justify-between z-20 bg-white/75 dark:bg-[#1c1c1e]/75 border-b border-black/[0.06] dark:border-white/[0.08] select-none transition-colors"
       >
         {/* Left: Back to Trips */}
         <button
@@ -230,7 +252,7 @@ export const MessagesView: React.FC = () => {
         {/* Center: Group Picture Stack and Trip Name strictly WITHOUT any arrow */}
         <div className="flex flex-col items-center justify-center">
           {/* Overlapping member avatars stack */}
-          <div className="flex -space-x-2 items-center justify-center mb-0.5">
+          <div className="flex -space-x-2 items-center justify-center mb-1">
             {tripMembers.length > 0 ? (
               tripMembers.slice(0, 3).map((m, idx) => (
                 <div
@@ -242,7 +264,7 @@ export const MessagesView: React.FC = () => {
                     name={m.profile?.display_name}
                     avatarUrl={m.profile?.avatar_url}
                     color={m.profile?.color}
-                    size={22}
+                    size={24}
                   />
                 </div>
               ))
@@ -250,13 +272,13 @@ export const MessagesView: React.FC = () => {
               <Avatar
                 name={currentTrip?.name || 'Trip'}
                 color="#007AFF"
-                size={22}
+                size={24}
               />
             )}
           </div>
 
           {/* Centered trip name without arrow */}
-          <span className="text-[12px] font-semibold text-slate-900 dark:text-white max-w-[170px] truncate leading-tight text-center">
+          <span className="text-[13px] font-semibold text-slate-900 dark:text-white max-w-[170px] truncate leading-tight text-center">
             {currentTrip?.name || 'Trip'}
           </span>
         </div>
@@ -274,14 +296,14 @@ export const MessagesView: React.FC = () => {
         onEndPoll={endPoll}
       />
 
-      {/* Messages Scroll Area */}
+      {/* Messages Scroll Area - starts from the top with generous clearance so messages never go under the input bar */}
       <CustomScrollArea scrollRef={scrollRef} className="flex-1 px-3">
         <div
-          className={`flex flex-col justify-end min-h-full ${hasOpenPolls ? 'pt-24' : 'pt-2'}`}
+          className={`flex flex-col justify-start min-h-full ${hasOpenPolls ? 'pt-24' : 'pt-3'}`}
           style={{
             paddingBottom: isKeyboardOpen
-              ? `${keyboardHeight + 68}px`
-              : 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)',
+              ? `${Math.max(keyboardHeight, 0) + 72}px`
+              : 'calc(env(safe-area-inset-bottom, 0px) + 6.5rem)',
           }}
         >
           {messageGroups.map(({ message, isFirstInGroup, isLastInGroup, showDaySeparator, dayLabel }) => {
@@ -323,8 +345,8 @@ export const MessagesView: React.FC = () => {
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             bottom: isKeyboardOpen
-              ? `${keyboardHeight + 58}px`
-              : 'calc(env(safe-area-inset-bottom, 0px) + 7.75rem)',
+              ? `${Math.max(keyboardHeight, 0) + 60}px`
+              : 'calc(env(safe-area-inset-bottom, 0px) + 7.25rem)',
           }}
           className="absolute left-3 right-3 z-30 px-4 py-2 flex items-center justify-between bg-white/85 dark:bg-[#202024]/85 border border-black/[0.06] dark:border-white/[0.08] rounded-[18px] text-xs text-slate-800 dark:text-slate-200 shadow-md animate-spring-in transition-[bottom] duration-150 ease-out"
         >
@@ -348,8 +370,8 @@ export const MessagesView: React.FC = () => {
       <div
         style={{
           bottom: isKeyboardOpen
-            ? `${keyboardHeight + 8}px`
-            : 'calc(env(safe-area-inset-bottom, 0px) + 4.25rem)',
+            ? `${Math.max(keyboardHeight, 0) + 8}px`
+            : 'calc(env(safe-area-inset-bottom, 0px) + 3.75rem)',
         }}
         className="absolute left-3 right-3 z-30 pointer-events-auto transition-[bottom] duration-150 ease-out"
       >
@@ -464,6 +486,8 @@ export const MessagesView: React.FC = () => {
               value={inputText}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
               className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[16px] resize-none outline-none pt-2 pb-1.5 leading-[1.35] max-h-32 overflow-y-auto transition-[height] duration-150 ease-out"
               style={{ minHeight: '36px', height: '36px' }}
             />

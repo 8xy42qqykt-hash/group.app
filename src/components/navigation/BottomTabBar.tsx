@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  ChatCircleText,
+  PaperPlaneTilt,
   ShoppingCart,
   ForkKnife,
   CalendarBlank,
@@ -26,8 +26,9 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
     const onResize = () => {
       const vv = window.visualViewport;
       if (!vv) return;
-      const diff = window.innerHeight - (vv.height + (vv.offsetTop || 0));
-      setIsKeyboardOpen(diff > 80 || (window.innerHeight - vv.height > 80));
+      // Detect keyboard open
+      const isShrunk = window.innerHeight - vv.height > 60;
+      setIsKeyboardOpen(isShrunk);
     };
 
     window.visualViewport.addEventListener('resize', onResize);
@@ -43,7 +44,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   }, []);
 
   const tabs: { key: TabKey; label: string; Icon: React.ComponentType<any> }[] = [
-    { key: 'messages', label: 'Messages', Icon: ChatCircleText },
+    { key: 'messages', label: 'Messages', Icon: PaperPlaneTilt },
     { key: 'groceries', label: 'Groceries', Icon: ShoppingCart },
     { key: 'meals', label: 'Meals', Icon: ForkKnife },
     { key: 'schedule', label: 'Schedule', Icon: CalendarBlank },
@@ -62,8 +63,8 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
         isKeyboardOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
       }`}
     >
-      {/* Comfortable reach with slightly larger icons and labels for mobile */}
-      <div className="max-w-md mx-auto grid grid-cols-5 items-center px-2 pt-2.5 pb-6 pb-[max(1.75rem,env(safe-area-inset-bottom))]">
+      {/* Sleek, flush nav bar with NO empty dead space underneath */}
+      <div className="max-w-md mx-auto grid grid-cols-5 items-center px-1.5 pt-1.5 pb-1 pb-[env(safe-area-inset-bottom,0px)]">
         {tabs.map(({ key, label, Icon }) => {
           const isActive = activeTab === key;
           return (
@@ -71,7 +72,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
               key={key}
               type="button"
               onClick={() => onChangeTab(key)}
-              className="flex flex-col items-center justify-center min-h-[46px] w-full cursor-pointer active-press group"
+              className="flex flex-col items-center justify-center py-1 min-h-[44px] w-full cursor-pointer active-press group"
             >
               <Icon
                 size={24}
