@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+/* Self-host Outfit weights 300 to 700 */
+@import "@fontsource/outfit/300.css";
+@import "@fontsource/outfit/400.css";
+@import "@fontsource/outfit/500.css";
+@import "@fontsource/outfit/600.css";
+@import "@fontsource/outfit/700.css";
+
+@layer base {
+  :root {
+    --accent: #0A84FF;
+    --accent-hover: #2965df;
+    --bg-page: #000000;
+    --bg-surface: rgba(28, 28, 32, 0.72);
+    --bg-grouped: #1c1c1e;
+    --text-primary: #ffffff;
+    --text-secondary: #8e8e93;
+    --text-tertiary: #636366;
+    --bubble-other: #262629;
+    --bubble-self: #0A84FF;
+    --glass-bg: rgba(28, 28, 32, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --separator: rgba(84, 84, 88, 0.2);
+  }
+
+  .light {
+    --accent: #007AFF;
+    --accent-hover: #0066d6;
+    --bg-page: #000000;
+    --bg-surface: rgba(28, 28, 32, 0.72);
+    --bg-grouped: #1c1c1e;
+    --text-primary: #ffffff;
+    --text-secondary: #8e8e93;
+    --text-tertiary: #636366;
+    --bubble-other: #262629;
+    --bubble-self: #0A84FF;
+    --glass-bg: rgba(28, 28, 32, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --separator: rgba(84, 84, 88, 0.2);
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: pan-x pan-y;
+    overflow: hidden;
+  }
+
+  /* Force Outfit everywhere including inputs, numbers, dates, emails, polls, popups */
+  *, *::before, *::after {
+    font-family: 'Outfit', sans-serif !important;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input, textarea, button, select {
+    font-family: 'Outfit', sans-serif !important;
+    outline: none;
+    border: none;
+  }
+
+  /* Hide native scrollbars across browsers */
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+/* Glass styling utilities with webkit-backdrop-filter support & lighter border */
+.glass-surface {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-floating {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 32px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+.glass-card {
+  background: var(--bg-grouped);
+}
+
+/* Safe area padding utilities */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Tap press feedback */
+.active-press {
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms ease;
+}
+.active-press:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* Smooth spring keyframes for elements spawning in and expanding */
+@keyframes springPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes smoothExpandIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-spring-in {
+  animation: springPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-expand-in {
+  animation: smoothExpandIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes calmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-calm-fade-in {
+  animation: calmFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active-press,
+  .animate-calm-fade-in,
+  .animate-spring-in,
+  .animate-expand-in,
+  .spring-transition {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Smooth spring easing transitions */
+.spring-transition {
+  transition: all 260ms cubic-bezier(0.175, 0.885, 0.32, 1.12);
+}
+
+/* Bubbles touch gestures */
+.chat-bubble-touch {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
