@@ -75,10 +75,12 @@ export const GroceriesView: React.FC = () => {
           <div className="flex items-center bg-white/10 dark:bg-white/10 rounded-[18px] px-3.5 py-1 border border-white/[0.06]">
             <input
               type="text"
+              inputMode="text"
+              enterKeyHint="done"
               placeholder="Add item (e.g. 2 milk, pasta 500g)..."
               value={quickAdd}
               onChange={(e) => setQuickAdd(e.target.value)}
-              className="flex-1 bg-transparent text-white placeholder:text-slate-400 text-sm h-8 outline-none"
+              className="flex-1 bg-transparent text-white placeholder:text-slate-400 text-[16px] h-8 outline-none"
             />
             {quickAdd.trim() && (
               <button
@@ -206,9 +208,11 @@ export const GroceriesView: React.FC = () => {
           <input
             type="text"
             autoFocus
+            inputMode="text"
+            enterKeyHint="done"
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white text-sm outline-none border border-white/[0.08]"
+            className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white text-[16px] outline-none border border-white/[0.08]"
           />
           <div className="pt-2 mb-4 flex gap-2">
             <button

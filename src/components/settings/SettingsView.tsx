@@ -111,9 +111,17 @@ export const SettingsView: React.FC = () => {
               <input
                 type="text"
                 autoFocus
+                inputMode="text"
+                enterKeyHint="done"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="h-8 px-3 rounded-full bg-black/5 dark:bg-white/10 text-sm text-center font-semibold text-slate-900 dark:text-slate-100 outline-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSaveName();
+                  }
+                }}
+                className="h-8 px-3 rounded-full bg-black/5 dark:bg-white/10 text-[16px] text-center font-semibold text-slate-900 dark:text-slate-100 outline-none"
               />
               <button
                 type="button"
@@ -209,10 +217,18 @@ export const SettingsView: React.FC = () => {
               <div>
                 <input
                   type="text"
+                  inputMode="text"
+                  enterKeyHint="done"
                   placeholder="Trip name"
                   value={tripName}
                   onChange={(e) => setTripName(e.target.value)}
-                  className="w-full h-10 px-3 rounded-[14px] bg-white dark:bg-black/40 text-slate-900 dark:text-white text-sm outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSaveTrip();
+                    }
+                  }}
+                  className="w-full h-10 px-3 rounded-[14px] bg-white dark:bg-black/40 text-slate-900 dark:text-white text-[16px] outline-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">

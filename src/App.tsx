@@ -11,6 +11,8 @@ import { MealsView } from './components/meals/MealsView';
 import { ScheduleView } from './components/schedule/ScheduleView';
 import { SettingsView } from './components/settings/SettingsView';
 
+import { PaperPlaneTilt } from '@phosphor-icons/react';
+
 const MainAppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
   const { currentTrip } = useTrip();
@@ -32,11 +34,13 @@ const MainAppContent: React.FC = () => {
     }
   }, [currentTrip?.id]);
 
-  // Splash screen until session resolves (capped by safety timeout)
+  // Splash screen until session resolves (white paperplane logo)
   if (isLoading && !isForcedReady) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-black">
-        <div className="w-10 h-10 rounded-[18px] bg-[#0A84FF] flex items-center justify-center animate-pulse" />
+        <div className="w-14 h-14 rounded-[22px] bg-white/10 border border-white/10 flex items-center justify-center animate-pulse shadow-lg">
+          <PaperPlaneTilt size={28} weight="fill" className="text-white -ml-0.5 mt-0.5" />
+        </div>
       </div>
     );
   }
@@ -53,8 +57,8 @@ const MainAppContent: React.FC = () => {
 
   // Active trip: Main tabs layout with bottom tab bar
   return (
-    <div className="h-screen w-full flex flex-col bg-black text-white overflow-hidden select-none">
-      <main className="flex-1 w-full overflow-hidden pb-24">
+    <div className="h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full flex flex-col bg-black text-white overflow-hidden select-none">
+      <main className="flex-1 w-full overflow-hidden relative">
         {activeTab === 'messages' && <MessagesView />}
         {activeTab === 'groceries' && <GroceriesView />}
         {activeTab === 'meals' && <MealsView />}

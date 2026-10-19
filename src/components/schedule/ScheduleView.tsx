@@ -8,6 +8,7 @@ import { BottomSheet } from '../common/BottomSheet';
 import { Avatar } from '../common/Avatar';
 import { getInitialTripDate, formatTime24 } from '../../utils/date';
 import { CollapsingHeaderLayout } from '../common/CollapsingHeaderLayout';
+import { handleEnterKeyNavigation } from '../../utils/formNavigation';
 
 export const ScheduleView: React.FC = () => {
   const { currentTrip, events, tripMembers, addEvent, toggleEventAttendance, editEvent, deleteEvent } = useTrip();
@@ -111,10 +112,12 @@ export const ScheduleView: React.FC = () => {
             <div className="flex items-center bg-black/5 dark:bg-white/10 rounded-[18px] px-3.5 py-1">
               <input
                 type="text"
+                inputMode="text"
+                enterKeyHint="done"
                 placeholder="Add event (e.g. 10:00 Ski lesson, 19:30 Dinner)..."
                 value={quickAdd}
                 onChange={(e) => setQuickAdd(e.target.value)}
-                className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-sm h-8 outline-none"
+                className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[16px] h-8 outline-none"
               />
               {quickAdd.trim() && (
                 <button
@@ -193,36 +196,51 @@ export const ScheduleView: React.FC = () => {
             <div>
               <input
                 type="text"
+                inputMode="text"
+                enterKeyHint="next"
+                autoCapitalize="sentences"
                 placeholder="Title"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
+                onKeyDown={(e) => handleEnterKeyNavigation(e)}
                 required
-                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-sm outline-none"
+                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-[16px] outline-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="text"
+                inputMode="text"
+                enterKeyHint="next"
                 placeholder="Time (e.g. 14:00)"
                 value={editTime}
                 onChange={(e) => setEditTime(e.target.value)}
-                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-sm outline-none"
+                onKeyDown={(e) => handleEnterKeyNavigation(e)}
+                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-[16px] outline-none"
               />
               <input
                 type="text"
+                inputMode="text"
+                enterKeyHint="next"
+                autoCapitalize="words"
                 placeholder="Location"
                 value={editLocation}
                 onChange={(e) => setEditLocation(e.target.value)}
-                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-sm outline-none"
+                onKeyDown={(e) => handleEnterKeyNavigation(e)}
+                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-[16px] outline-none"
               />
             </div>
             <div>
               <input
                 type="text"
+                inputMode="text"
+                enterKeyHint="done"
+                autoCapitalize="sentences"
                 placeholder="Notes"
                 value={editNotes}
                 onChange={(e) => setEditNotes(e.target.value)}
-                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-sm outline-none"
+                onKeyDown={(e) => handleEnterKeyNavigation(e)}
+                className="w-full h-11 px-4 rounded-[16px] bg-black/5 dark:bg-white/10 text-slate-900 dark:text-white text-[16px] outline-none"
               />
             </div>
             <div className="flex items-center gap-2 pt-2 mb-5">

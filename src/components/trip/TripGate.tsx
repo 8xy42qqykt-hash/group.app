@@ -5,7 +5,7 @@ import { DatePickerModal } from '../common/DatePickerModal';
 import { formatTripDate, getTodayDateString } from '../../utils/date';
 import { Avatar } from '../common/Avatar';
 import { BottomSheet } from '../common/BottomSheet';
-import { Plus, Hash, CalendarBlank, SignOut, CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { Plus, Hash, CalendarBlank, SignOut, CaretLeft, CaretRight, PaperPlaneTilt } from '@phosphor-icons/react';
 
 export const TripGate: React.FC = () => {
   const { createTrip, joinTrip, userTrips, selectTrip, loadUserTrips, isLoadingTrips } = useTrip();
@@ -69,15 +69,20 @@ export const TripGate: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-start px-4 pt-10 pb-8 max-w-md mx-auto bg-black text-white select-none pt-safe pb-safe">
-      {/* Apple-style Large Title Header */}
+      {/* Apple-style Large Title Header with White Paperplane Logo */}
       <div className="flex items-end justify-between mb-6 px-1 pt-2">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">
-            Trips
-          </h1>
-          <span className="text-[13px] font-medium text-slate-400">
-            {userTrips.length === 1 ? '1 trip' : `${userTrips.length} trips`}
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-[14px] bg-white/10 border border-white/10 flex items-center justify-center shadow-sm">
+            <PaperPlaneTilt size={20} weight="fill" className="text-white -ml-0.5 mt-0.5" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
+              Trips
+            </h1>
+            <span className="text-[13px] font-medium text-slate-400">
+              {userTrips.length === 1 ? '1 trip' : `${userTrips.length} trips`}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -232,11 +237,16 @@ export const TripGate: React.FC = () => {
               <input
                 type="text"
                 autoFocus
+                inputMode="text"
+                enterKeyHint="done"
+                autoCapitalize="words"
+                autoCorrect="on"
+                spellCheck={true}
                 placeholder="Trip Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-sm outline-none border border-white/[0.08]"
+                className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-[16px] outline-none border border-white/[0.08]"
               />
 
               <div className="grid grid-cols-2 gap-2">
@@ -295,6 +305,11 @@ export const TripGate: React.FC = () => {
               <input
                 type="text"
                 autoFocus
+                inputMode="text"
+                enterKeyHint="go"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
                 maxLength={6}
                 placeholder="Invite Code (e.g. ABCXYZ)"
                 value={inviteCode}
@@ -303,7 +318,7 @@ export const TripGate: React.FC = () => {
                   setJoinError(null);
                 }}
                 required
-                className="w-full h-12 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-center font-bold tracking-widest text-lg outline-none border border-white/[0.08]"
+                className="w-full h-12 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-center font-bold tracking-widest text-[18px] outline-none border border-white/[0.08]"
               />
 
               {joinError && (

@@ -94,8 +94,8 @@ export const CollapsingHeaderLayout: React.FC<CollapsingHeaderLayoutProps> = ({
           {headerSubContent && <div className="mt-1.5">{headerSubContent}</div>}
         </div>
 
-        {/* Content */}
-        <div className="px-4 pb-20">
+        {/* Content with comfortable clearance above bottom nav bar on mobile */}
+        <div className="px-4 pb-28 pb-[max(7rem,calc(env(safe-area-inset-bottom)+5.5rem))]">
           {children}
         </div>
       </div>

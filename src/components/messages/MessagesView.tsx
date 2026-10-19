@@ -43,9 +43,42 @@ export const MessagesView: React.FC = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Virtual keyboard tracking for mobile
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // Track visualViewport for iOS and mobile keyboard changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleViewportChange = () => {
+      const vv = window.visualViewport;
+      if (!vv) return;
+      const offsetFromBottom = window.innerHeight - (vv.height + (vv.offsetTop || 0));
+      const isOpen = offsetFromBottom > 80 || (window.innerHeight - vv.height > 80);
+      setIsKeyboardOpen(isOpen);
+      setKeyboardHeight(isOpen ? Math.max(0, offsetFromBottom, window.innerHeight - vv.height) : 0);
+      if (isOpen) {
+        setTimeout(scrollToBottom, 60);
+      }
+    };
+
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    window.visualViewport?.addEventListener('scroll', handleViewportChange);
+    window.addEventListener('resize', handleViewportChange);
+
+    handleViewportChange();
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+      window.removeEventListener('resize', handleViewportChange);
+    };
+  }, []);
 
   // Auto-scroll on new messages
   const scrollToBottom = () => {
@@ -243,7 +276,14 @@ export const MessagesView: React.FC = () => {
 
       {/* Messages Scroll Area */}
       <CustomScrollArea scrollRef={scrollRef} className="flex-1 px-3">
-        <div className={`flex flex-col justify-end min-h-full pb-20 ${hasOpenPolls ? 'pt-24' : 'pt-2'}`}>
+        <div
+          className={`flex flex-col justify-end min-h-full ${hasOpenPolls ? 'pt-24' : 'pt-2'}`}
+          style={{
+            paddingBottom: isKeyboardOpen
+              ? `${keyboardHeight + 68}px`
+              : 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)',
+          }}
+        >
           {messageGroups.map(({ message, isFirstInGroup, isLastInGroup, showDaySeparator, dayLabel }) => {
             const replyMsg = message.reply_to
               ? messages.find((m) => m.id === message.reply_to)
@@ -282,8 +322,11 @@ export const MessagesView: React.FC = () => {
           style={{
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            bottom: isKeyboardOpen
+              ? `${keyboardHeight + 58}px`
+              : 'calc(env(safe-area-inset-bottom, 0px) + 7.75rem)',
           }}
-          className="absolute bottom-16 left-3 right-3 z-30 px-4 py-2 flex items-center justify-between bg-white/85 dark:bg-[#202024]/85 border border-black/[0.06] dark:border-white/[0.08] rounded-[18px] text-xs text-slate-800 dark:text-slate-200 shadow-md animate-spring-in"
+          className="absolute left-3 right-3 z-30 px-4 py-2 flex items-center justify-between bg-white/85 dark:bg-[#202024]/85 border border-black/[0.06] dark:border-white/[0.08] rounded-[18px] text-xs text-slate-800 dark:text-slate-200 shadow-md animate-spring-in transition-[bottom] duration-150 ease-out"
         >
           <div className="truncate pr-2">
             <span className="font-semibold text-[#007AFF] dark:text-[#0A84FF] mr-1">
@@ -302,7 +345,14 @@ export const MessagesView: React.FC = () => {
       )}
 
       {/* Floating Message Input & Expand Menu Container (NO background panel behind them) */}
-      <div className="absolute bottom-2 left-3 right-3 z-30 pointer-events-auto">
+      <div
+        style={{
+          bottom: isKeyboardOpen
+            ? `${keyboardHeight + 8}px`
+            : 'calc(env(safe-area-inset-bottom, 0px) + 4.25rem)',
+        }}
+        className="absolute left-3 right-3 z-30 pointer-events-auto transition-[bottom] duration-150 ease-out"
+      >
         <input
           type="file"
           ref={photoInputRef}
@@ -402,12 +452,19 @@ export const MessagesView: React.FC = () => {
           >
             <textarea
               ref={textareaRef}
+              id="chat-message-input"
+              name="message"
               rows={1}
+              inputMode="text"
+              autoCapitalize="sentences"
+              autoCorrect="on"
+              spellCheck={true}
+              enterKeyHint="send"
               placeholder="Message"
               value={inputText}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[15px] resize-none outline-none pt-2 pb-1.5 leading-[1.35] max-h-32 overflow-y-auto transition-[height] duration-150 ease-out"
+              className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[16px] resize-none outline-none pt-2 pb-1.5 leading-[1.35] max-h-32 overflow-y-auto transition-[height] duration-150 ease-out"
               style={{ minHeight: '36px', height: '36px' }}
             />
           </div>

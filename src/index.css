@@ -40,6 +40,16 @@
     --separator: rgba(84, 84, 88, 0.2);
   }
 
+  html {
+    font-size: 16px;
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 16.75px;
+    }
+  }
+
   html, body {
     height: 100%;
     margin: 0;

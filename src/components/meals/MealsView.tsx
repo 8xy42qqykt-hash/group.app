@@ -8,6 +8,7 @@ import { BottomSheet } from '../common/BottomSheet';
 import { Avatar } from '../common/Avatar';
 import { getInitialTripDate } from '../../utils/date';
 import { CollapsingHeaderLayout } from '../common/CollapsingHeaderLayout';
+import { handleEnterKeyNavigation } from '../../utils/formNavigation';
 
 export const MealsView: React.FC = () => {
   const { currentTrip, meals, addMeal, toggleMealVote, assignCooking, sendMealToGroceries, deleteMeal } = useTrip();
@@ -229,10 +230,16 @@ export const MealsView: React.FC = () => {
             <input
               type="text"
               autoFocus
+              inputMode="text"
+              enterKeyHint="done"
+              autoCapitalize="words"
+              autoCorrect="on"
+              spellCheck={true}
               placeholder="e.g. Breakfast, Lunch, Dinner, Late Snack..."
               value={newSlotInput}
               onChange={(e) => setNewSlotInput(e.target.value)}
-              className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-sm outline-none border border-white/[0.08]"
+              onKeyDown={(e) => handleEnterKeyNavigation(e)}
+              className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-[16px] outline-none border border-white/[0.08]"
             />
           </div>
 
@@ -308,10 +315,14 @@ export const MealsView: React.FC = () => {
             ) : (
               <input
                 type="text"
+                inputMode="text"
+                enterKeyHint="next"
+                autoCapitalize="words"
                 placeholder="Slot name (e.g. Dinner)"
                 value={selectedSlotForMeal}
                 onChange={(e) => setSelectedSlotForMeal(e.target.value)}
-                className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-sm outline-none border border-white/[0.08]"
+                onKeyDown={(e) => handleEnterKeyNavigation(e)}
+                className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-[16px] outline-none border border-white/[0.08]"
               />
             )}
           </div>
@@ -323,10 +334,16 @@ export const MealsView: React.FC = () => {
             <input
               type="text"
               autoFocus
+              inputMode="text"
+              enterKeyHint="done"
+              autoCapitalize="words"
+              autoCorrect="on"
+              spellCheck={true}
               placeholder="e.g. Homemade Tacos, Pasta Carbonara..."
               value={mealNameInput}
               onChange={(e) => setMealNameInput(e.target.value)}
-              className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-sm outline-none border border-white/[0.08]"
+              onKeyDown={(e) => handleEnterKeyNavigation(e)}
+              className="w-full h-11 px-4 rounded-[16px] bg-white/10 text-white placeholder:text-slate-500 text-[16px] outline-none border border-white/[0.08]"
             />
           </div>
 

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { PaperPlaneTilt } from '@phosphor-icons/react';
+import { handleEnterKeyNavigation } from '../../utils/formNavigation';
 
 export const AuthScreen: React.FC = () => {
   const { signIn, signUp } = useAuth();
@@ -31,12 +33,15 @@ export const AuthScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-center px-4 py-12 max-w-sm mx-auto animate-calm-fade-in bg-[#f2f2f7] dark:bg-black select-none">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+    <div className="min-h-screen w-full flex flex-col justify-center px-4 py-12 max-w-sm mx-auto animate-calm-fade-in bg-black text-white select-none">
+      <div className="mb-8 text-center flex flex-col items-center">
+        <div className="w-16 h-16 rounded-[24px] bg-white/10 border border-white/15 flex items-center justify-center mb-3 shadow-lg">
+          <PaperPlaneTilt size={32} weight="fill" className="text-white -ml-0.5 mt-0.5" />
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-white">
           Trip
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-400 mt-1">
           {isSignUp ? 'Create your account' : 'Sign in to access your trips'}
         </p>
       </div>
@@ -48,12 +53,16 @@ export const AuthScreen: React.FC = () => {
             <div className="px-4 py-2">
               <input
                 type="text"
+                inputMode="text"
                 autoComplete="name"
+                enterKeyHint="next"
+                autoCapitalize="words"
                 placeholder="Display Name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
+                onKeyDown={(e) => handleEnterKeyNavigation(e)}
                 required={isSignUp}
-                className="w-full h-9 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-sm outline-none"
+                className="w-full h-9 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[16px] outline-none"
               />
             </div>
           )}
@@ -61,12 +70,16 @@ export const AuthScreen: React.FC = () => {
           <div className="px-4 py-2">
             <input
               type="email"
+              inputMode="email"
               autoComplete="email"
+              enterKeyHint="next"
+              autoCapitalize="none"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => handleEnterKeyNavigation(e)}
               required
-              className="w-full h-9 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-sm outline-none"
+              className="w-full h-9 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[16px] outline-none"
             />
           </div>
 
@@ -74,11 +87,13 @@ export const AuthScreen: React.FC = () => {
             <input
               type="password"
               autoComplete={isSignUp ? 'new-password' : 'current-password'}
+              enterKeyHint="go"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => handleEnterKeyNavigation(e)}
               required
-              className="w-full h-9 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-sm outline-none"
+              className="w-full h-9 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 text-[16px] outline-none"
             />
           </div>
         </div>
